@@ -1,6 +1,7 @@
-﻿using MongoDB.Driver;
-using MongodbAccess.Model;
+﻿using System;
 using System.Collections.Generic;
+using MongoDB.Driver;
+using MongodbAccess.Model;
 
 namespace MongodbAccess.Services
 {
@@ -11,6 +12,8 @@ namespace MongodbAccess.Services
 
         public static IMongoDatabase GetDatabase(MongodbConfig mongodbConfig)
         {
+            ValidateParams(mongodbConfig);
+
             string databaseKey = mongodbConfig.ConnectionString + mongodbConfig.DBName;
 
             MongoClient mongoClient = null;
@@ -40,6 +43,24 @@ namespace MongodbAccess.Services
             }
 
             return database;
+        }
+
+        private static void ValidateParams(MongodbConfig mongodbConfig)
+        {
+            if (mongodbConfig == null)
+            {
+                throw new ArgumentNullException("The config provided can't be null");
+            }
+
+            if (string.IsNullOrEmpty(mongodbConfig.ConnectionString))
+            {
+                throw new ArgumentNullException("The config provided can't be null");
+            }
+
+            if (string.IsNullOrEmpty(mongodbConfig.DBName))
+            {
+                throw new ArgumentNullException("The config provided can't be null");
+            }
         }
     }
 }

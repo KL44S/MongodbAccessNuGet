@@ -6,13 +6,13 @@
     <Authors>KL44S</Authors>
     <Company>MT</Company>
     <Description>Provides objects which implement the repository pattern in order to access to MongoDB</Description>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.9.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="RepositoryAbstractions" Version="1.0.5" />
+    <PackageReference Include="RepositoryAbstractions" Version="1.0.6" />
   </ItemGroup>
 
 </Project>

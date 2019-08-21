@@ -13,7 +13,7 @@ namespace MongodbAccess.Implementations
 
         public async Task DeleteAllByConditionsAsync(Expression<Func<T, bool>> expression)
         {
-            await this.MongoCollection.DeleteManyAsync(expression);
+            await this._mongoCollection.DeleteManyAsync(expression);
         }
     }
 }

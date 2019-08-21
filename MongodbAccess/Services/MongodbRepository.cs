@@ -6,7 +6,7 @@ namespace MongodbAccess.Services
 {
     public abstract class MongodbRepository<T>
     {
-        protected IMongoCollection<T> MongoCollection;
+        protected IMongoCollection<T> _mongoCollection;
 
         public MongodbRepository(IMongoDatabase mongoDatabase)
         {
@@ -14,7 +14,7 @@ namespace MongodbAccess.Services
 
             string collectionName = MongodbHelper.GetCollectionName<T>();
 
-            this.MongoCollection = mongoDatabase.GetCollection<T>(collectionName);
+            this._mongoCollection = mongoDatabase.GetCollection<T>(collectionName);
         }
 
         private void RegisterAutoMap()

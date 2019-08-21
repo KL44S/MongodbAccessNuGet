@@ -16,7 +16,7 @@ namespace MongodbAccess.Implementations
 
         public async Task<IList<T>> GetAllAsync()
         {
-            IList<T> entities = await this.MongoCollection.AsQueryable().ToListAsync();
+            IList<T> entities = await this._mongoCollection.AsQueryable().ToListAsync();
 
             return entities;
         }
@@ -44,7 +44,7 @@ namespace MongodbAccess.Implementations
 
         private IMongoQueryable<T> GetQueryableByConditions(Expression<Func<T, bool>> expression)
         {
-            IMongoQueryable<T> entities = this.MongoCollection.AsQueryable().Where(expression);
+            IMongoQueryable<T> entities = this._mongoCollection.AsQueryable().Where(expression);
 
             return entities;
         }
@@ -56,11 +56,11 @@ namespace MongodbAccess.Implementations
             switch (sort.SortType)
             {
                 case SortType.Asc:
-                    entities = this.MongoCollection.AsQueryable().Where(expression).OrderBy(sort.SortExpression);
+                    entities = this._mongoCollection.AsQueryable().Where(expression).OrderBy(sort.SortExpression);
                     break;
 
                 case SortType.Desc:
-                    entities = this.MongoCollection.AsQueryable().Where(expression).OrderByDescending(sort.SortExpression);
+                    entities = this._mongoCollection.AsQueryable().Where(expression).OrderByDescending(sort.SortExpression);
                     break;
                 default:
                     throw new ArgumentException();

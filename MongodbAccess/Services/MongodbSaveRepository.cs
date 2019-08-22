@@ -30,7 +30,7 @@ namespace MongodbAccess.Implementations
         {
             var result = await this._mongoCollection.UpdateManyAsync(expression, updateDefinition);
 
-            return (result.IsAcknowledged && result.ModifiedCount > 0);
+            return (result.IsAcknowledged && result.MatchedCount > 0 && result.ModifiedCount > 0);
         }
     }
 }

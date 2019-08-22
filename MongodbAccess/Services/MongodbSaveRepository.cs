@@ -26,9 +26,11 @@ namespace MongodbAccess.Implementations
             await this._mongoCollection.ReplaceOneAsync(expression, entity);
         }
 
-        public async Task UpdateMany(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition)
+        public async Task<bool> UpdateMany(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition)
         {
-            await this._mongoCollection.UpdateManyAsync(expression, updateDefinition);
+            var result = await this._mongoCollection.UpdateManyAsync(expression, updateDefinition);
+
+            return (result.IsAcknowledged && result.ModifiedCount > 0);
         }
     }
 }

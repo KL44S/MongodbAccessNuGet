@@ -6,7 +6,7 @@
     <Authors>KL44S</Authors>
     <Company>MT</Company>
     <Description>Provides objects which implement the repository pattern in order to access to MongoDB</Description>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <ItemGroup>

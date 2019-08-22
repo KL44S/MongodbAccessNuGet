@@ -8,6 +8,6 @@ namespace MongodbAccess.Services
 {
     public interface IMongodbSaveRepository<T> : ISaveRepository<T>
     {
-        Task UpdateMany(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition);
+        Task<bool> UpdateMany(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition);
     }
 }

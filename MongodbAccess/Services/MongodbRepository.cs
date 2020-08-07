@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongodbAccess.Helpers;
 
@@ -19,6 +20,9 @@ namespace MongodbAccess.Services
 
         private void RegisterAutoMap()
         {
+            var conventionPack = new ConventionPack { new IgnoreExtraElementsConvention(true) };
+            ConventionRegistry.Register("IgnoreExtraElements", conventionPack, type => true);
+
             if (!BsonClassMap.IsClassMapRegistered(typeof(T)))
             {
                 BsonClassMap.RegisterClassMap<T>(cm =>

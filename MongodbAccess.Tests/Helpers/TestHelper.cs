@@ -22,7 +22,7 @@ namespace MongodbAccess.Tests.Helpers
             return tests;
         }
 
-        private static Test CreateRandomTest()
+        public static Test CreateRandomTest()
         {
             Test test = new Test()
             {
@@ -35,7 +35,7 @@ namespace MongodbAccess.Tests.Helpers
             return test;
         }
 
-        private static string CreateRandomString()
+        public static string CreateRandomString()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -43,14 +43,14 @@ namespace MongodbAccess.Tests.Helpers
               .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
 
-        private static bool CreateRandomBool()
+        public static bool CreateRandomBool()
         {
             int probability = Random.Next(100);
 
             return probability <= 20;
         }
 
-        private static DateTime CreateRandomDatetime()
+        public static DateTime CreateRandomDatetime()
         {
             DateTime start = new DateTime(1995, 1, 1);
             int range = (DateTime.Today - start).Days;

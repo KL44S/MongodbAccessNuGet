@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongodbAccess.Model;
 using MongodbAccess.Services;
 using RepositoryAccess;
 using System;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MongodbAccess.Implementations
 {
-    public class MongodbDeleteRepository<T> : MongodbRepository<T>, IDeleteRepository<T>
+    public class MongodbDeleteRepository<T> : MongodbRepository<T>, IDeleteRepository<T> where T : IdObject
     {
         public MongodbDeleteRepository(IMongoDatabase mongoDatabase) : base(mongoDatabase) { }
 

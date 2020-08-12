@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using MongodbAccess.Model;
 using MongodbAccess.Services;
 using RepositoryAccess;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MongodbAccess.Implementations
 {
-    public class MongodbGetRepository<T> : MongodbRepository<T>, IGetRepository<T>
+    public class MongodbGetRepository<T> : MongodbRepository<T>, IGetRepository<T> where T : IdObject
     {
         public MongodbGetRepository(IMongoDatabase mongoDatabase) : base(mongoDatabase) { }
 

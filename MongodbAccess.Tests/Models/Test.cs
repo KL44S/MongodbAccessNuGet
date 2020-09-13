@@ -1,9 +1,8 @@
-﻿using MongodbAccess.Model;
-using System;
+﻿using System;
 
 namespace MongodbAccess.Tests.Models
 {
-    public class Test : IdObject
+    public class Test
     {
         public string StringField { get; set; }
         public double NumberField { get; set; }

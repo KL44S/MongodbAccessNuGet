@@ -5,15 +5,15 @@
     <RootNamespace>MongodbAccess</RootNamespace>
     <Authors>KL44S</Authors>
     <Company>MT</Company>
-    <Description>Provides objects which implement the repository pattern in order to access to MongoDB</Description>
-    <Version>2.0.0</Version>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <Description>Provides concrete repositories to access to MongoDB.</Description>
+    <Version>3.0.0</Version>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="RepositoryAbstractions" Version="2.0.0" />
+    <PackageReference Include="RepositoryAbstractions" Version="3.0.0" />
   </ItemGroup>
 
 </Project>

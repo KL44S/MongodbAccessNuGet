@@ -1,15 +1,11 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
+﻿using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.IdGenerators;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using MongodbAccess.Helpers;
-using MongodbAccess.Model;
 
 namespace MongodbAccess.Services
 {
-    public abstract class MongodbRepository<T> where T : IdObject
+    public abstract class MongodbRepository<T>
     {
         protected IMongoCollection<T> _mongoCollection;
 
@@ -33,9 +29,6 @@ namespace MongodbAccess.Services
                 {
                     cm.AutoMap();
                     cm.SetIgnoreExtraElements(true);
-                    cm.MapIdProperty(c => c.ObjectId)
-                        .SetIdGenerator(StringObjectIdGenerator.Instance)
-                        .SetSerializer(new StringSerializer(BsonType.ObjectId));
                 });
             }
         }

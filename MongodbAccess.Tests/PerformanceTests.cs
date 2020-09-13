@@ -27,13 +27,13 @@ namespace MongodbAccess.Tests
             IList<Test> tests = TestHelper.CreateRandomTests(100);
 
             // First insert in order establish the connection
-            await saveRepository.SaveAsync(tests.ElementAt(0));
+            await saveRepository.InsertAsync(tests.ElementAt(0));
 
             // One-by-one insert
             stopwatch.Restart();
             foreach (Test test in tests)
             {
-                await saveRepository.SaveAsync(test);
+                await saveRepository.InsertAsync(test);
             }
             stopwatch.Stop();
             TimeSpan oneByOneTime = stopwatch.Elapsed;
@@ -43,7 +43,7 @@ namespace MongodbAccess.Tests
             IList<Task> tasks = new List<Task>();
             foreach (Test test in tests)
             {
-                tasks.Add(saveRepository.SaveAsync(test));
+                tasks.Add(saveRepository.InsertAsync(test));
             }
             await Task.WhenAll(tasks);
             stopwatch.Stop();
@@ -51,7 +51,7 @@ namespace MongodbAccess.Tests
 
             // Insert many (bulk)
             stopwatch.Restart();
-            await saveRepository.SaveAsync(tests);
+            await saveRepository.InsertManyAsync(tests);
             stopwatch.Stop();
             TimeSpan bulkTime = stopwatch.Elapsed;
 

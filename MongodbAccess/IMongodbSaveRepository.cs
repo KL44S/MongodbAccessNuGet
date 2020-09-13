@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using MongodbAccess.Model;
 using RepositoryAccess;
 using System;
 using System.Linq.Expressions;
@@ -8,6 +9,6 @@ namespace MongodbAccess
 {
     public interface IMongodbSaveRepository<T> : ISaveRepository<T>
     {
-        Task<bool> UpdateManyAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition);
+        Task<SaveResult> UpdateManyAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition);
     }
 }

@@ -4,6 +4,7 @@ using MongodbAccess.Model;
 using MongodbAccess.Services;
 using MongodbAccess.Tests.Helpers;
 using MongodbAccess.Tests.Models;
+using RepositoryAbstractions.Exceptions;
 using RepositoryAccess;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,19 @@ namespace MongodbAccess.Tests
         #region Get tests
 
         [Fact]
-        public async Task NullExpressionTest()
+        public async Task NoResultsOnGetTest()
+        {
+            MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
+            IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
+            IGetRepository<Test> getRepository = new MongodbGetRepository<Test>(database);
+
+            IList<Test> tests = await getRepository.GetAllByConditionsAsync(x => x.ObjectId == "unexistent-object");
+
+            Assert.Empty(tests);
+        }
+
+        [Fact]
+        public async Task NullExpressionOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -32,7 +45,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NullExpressionWithSortTest()
+        public async Task NullExpressionWithSortOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -48,7 +61,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NullExpressionWithSortAndPaginationTest()
+        public async Task NullExpressionWithSortAndPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -65,7 +78,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NullSortTest()
+        public async Task NullSortOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -79,7 +92,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NullSortWithPaginationTest()
+        public async Task NullSortWithPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -94,7 +107,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NullPaginationTest()
+        public async Task NullPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -372,6 +385,16 @@ namespace MongodbAccess.Tests
             await Assert.ThrowsAsync<ArgumentNullException>(() => saveRepository.InsertManyAsync(null));
         }
 
+        [Fact]
+        public async Task NothingToReplaceTest()
+        {
+            MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
+            IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
+            IMongodbSaveRepository<Test> saveRepository = new MongodbSaveRepository<Test>(database);
+
+            await Assert.ThrowsAsync<ReplaceException>(() => saveRepository.ReplaceAsync(x => x.ObjectId == "non-existent-object", new Test() { StringField = "nothing-to-replace-test" }));
+        }
+
         #endregion
 
         #region Delete tests
@@ -384,6 +407,16 @@ namespace MongodbAccess.Tests
             IDeleteRepository<Test> deleteRepository = new MongodbDeleteRepository<Test>(database);
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => deleteRepository.DeleteAllByConditionsAsync(null));
+        }
+
+        [Fact]
+        public async Task NothingToDeleteTest()
+        {
+            MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
+            IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
+            IDeleteRepository<Test> deleteRepository = new MongodbDeleteRepository<Test>(database);
+
+            await deleteRepository.DeleteAllByConditionsAsync(x => x.ObjectId == "non-existent-object");
         }
 
         #endregion

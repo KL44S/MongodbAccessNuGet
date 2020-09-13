@@ -1,5 +1,8 @@
 ﻿using MongoDB.Driver;
+using MongodbAccess.Model;
 using MongodbAccess.Services;
+using MongodbAccess.Utils;
+using RepositoryAbstractions.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -12,11 +15,12 @@ namespace MongodbAccess.Implementations
 
         public MongodbSaveRepository(IMongoDatabase mongoDatabase) : base(mongoDatabase) { }
 
-        public async Task<bool> UpdateManyAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition)
+        public async Task<SaveResult> UpdateManyAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition)
         {
-            var result = await this._mongoCollection.UpdateManyAsync(expression, updateDefinition);
+            UpdateResult updateResult = await this._mongoCollection.UpdateManyAsync(expression, updateDefinition);
+            SaveResult saveResult = updateResult.ToSaveResult();
 
-            return (result.IsAcknowledged && result.MatchedCount > 0 && result.ModifiedCount > 0);
+            return saveResult;
         }
 
         public async Task InsertAsync(T entity)
@@ -54,7 +58,20 @@ namespace MongodbAccess.Implementations
                 throw new ArgumentNullException(nameof(entity));
             }
 
-            await this._mongoCollection.ReplaceOneAsync(expression, entity);
+            ReplaceOneResult result = await this._mongoCollection.ReplaceOneAsync(expression, entity);
+            
+            if (!result.IsAcknowledged)
+            {
+                throw new ReplaceException("The operation was not acknowledged.");
+            }
+            else if (result.MatchedCount == 0)
+            {
+                throw new ReplaceException("No record matched the expression.");
+            }
+            else if (result.ModifiedCount == 0)
+            {
+                throw new ReplaceException("No record replaced.");
+            }
         }
     }
 }

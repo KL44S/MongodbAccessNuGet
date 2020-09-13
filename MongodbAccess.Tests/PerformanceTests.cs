@@ -16,7 +16,7 @@ namespace MongodbAccess.Tests
 {
     public class PerformanceTests
     {
-        [Fact]
+        [Fact(Skip="Only for manual testing purposes.")]
         public async Task InsertManyVsInsertOne()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();

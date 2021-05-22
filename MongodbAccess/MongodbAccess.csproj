@@ -7,7 +7,8 @@
     <Company>MT</Company>
     <Description>Provides concrete repositories to access to MongoDB.</Description>
     <Version>3.0.1</Version>
-    <AssemblyVersion>3.0.1.0</AssemblyVersion>
+    <AssemblyVersion>3.0.2.0</AssemblyVersion>
+    <FileVersion>3.0.21.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

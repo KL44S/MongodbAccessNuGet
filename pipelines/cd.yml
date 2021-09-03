@@ -15,9 +15,11 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  group: secrets
-  artifactPath: '$(Pipeline.Workspace)/mongodb-ci/drop'
-  pkgName: ''
+- group: secrets
+- name: artifactPath
+  value: '$(Pipeline.Workspace)/mongodb-ci/drop'
+- name: pkgName
+  value: ''
 
 steps:
 - task: DownloadPipelineArtifact@2

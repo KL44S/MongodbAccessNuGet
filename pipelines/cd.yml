@@ -22,6 +22,7 @@ variables:
   value: ''
 
 steps:
+- script: echo $(nuget-key-vg)
 - task: DownloadPipelineArtifact@2
   displayName: Download Artifact
   inputs:

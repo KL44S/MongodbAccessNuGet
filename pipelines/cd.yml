@@ -45,5 +45,5 @@ steps:
 
 - script: dotnet nuget push $(artifactPath)/$(pkgName) -k $(NUGETKEY) -s https://api.nuget.org/v3/index.json
   env:
-    NUGETKEY: '$(nugetKey)'
+    NUGETKEY: $nugetKey
   displayName: Push NuGet to feed

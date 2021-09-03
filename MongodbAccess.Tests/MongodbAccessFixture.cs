@@ -4,6 +4,7 @@ using MongodbAccess.Model;
 using MongodbAccess.Services;
 using MongodbAccess.Tests.Helpers;
 using MongodbAccess.Tests.Models;
+using MongodbAccess.Tests.Services;
 using RepositoryAbstractions.Exceptions;
 using RepositoryAccess;
 using System;
@@ -16,22 +17,24 @@ namespace MongodbAccess.Tests
 {
     public class MongodbAccessFixture
     {
+        private readonly IEqualityComparer<Test> _equalityComparer = new TestsComparer();
+
         #region Get tests
 
         [Fact]
-        public async Task NoResultsOnGetTest()
+        public void NoResultsOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
             IGetRepository<Test> getRepository = new MongodbGetRepository<Test>(database);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(x => x.ObjectId == "unexistent-object");
+            IList<Test> tests = getRepository.GetAllByConditions(x => x.ObjectId == "unexistent-object").ToList();
 
             Assert.Empty(tests);
         }
 
         [Fact]
-        public async Task NullExpressionOnGetTest()
+        public void NullExpressionOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -41,11 +44,11 @@ namespace MongodbAccess.Tests
                                         x => x.StringField,
                                         SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(null));
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(null).ToList());
         }
 
         [Fact]
-        public async Task NullExpressionWithSortOnGetTest()
+        public void NullExpressionWithSortOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -55,13 +58,13 @@ namespace MongodbAccess.Tests
                                         x => x.StringField,
                                         SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(
                                                         null,
                                                         sort));
         }
 
         [Fact]
-        public async Task NullExpressionWithSortAndPaginationOnGetTest()
+        public void NullExpressionWithSortAndPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -71,14 +74,14 @@ namespace MongodbAccess.Tests
                                         x => x.StringField,
                                         SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(
                                                         null,
                                                         sort,
                                                         new Pagination(0, 2)));
         }
 
         [Fact]
-        public async Task NullSortOnGetTest()
+        public void NullSortOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -86,13 +89,13 @@ namespace MongodbAccess.Tests
 
             Sort<Test, bool> sort = null;
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort));
         }
 
         [Fact]
-        public async Task NullSortWithPaginationOnGetTest()
+        public void NullSortWithPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -100,14 +103,14 @@ namespace MongodbAccess.Tests
 
             Sort<Test, bool> sort = null;
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
                                                         new Pagination(0, 2)));
         }
 
         [Fact]
-        public async Task NullPaginationOnGetTest()
+        public void NullPaginationOnGetTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -117,14 +120,14 @@ namespace MongodbAccess.Tests
                                           x => x.StringField,
                                           SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentNullException>(() => getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
                                                         null));
         }
 
         [Fact]
-        public async Task InvalidPaginationSkipNumberTest()
+        public void InvalidPaginationSkipNumberTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -134,14 +137,14 @@ namespace MongodbAccess.Tests
                                           x => x.StringField,
                                           SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentException>(() => getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
                                                         new Pagination(-5, 2)));
         }
 
         [Fact]
-        public async Task InvalidPaginationTakeNumberTest()
+        public void InvalidPaginationTakeNumberTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -151,14 +154,14 @@ namespace MongodbAccess.Tests
                                           x => x.StringField,
                                           SortType.Desc);
 
-            await Assert.ThrowsAsync<ArgumentException>(() => getRepository.GetAllByConditionsAsync(
+            Assert.Throws<ArgumentException>(() => getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
                                                         new Pagination(0, -2)));
         }
 
         [Fact]
-        public async Task StringDescSortAndPaginationTest()
+        public void StringDescSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -168,20 +171,16 @@ namespace MongodbAccess.Tests
                                         x => x.StringField,
                                         SortType.Desc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> sortedTests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
-            Assert.True(tests != null && tests.Count == 2);
-
-            IList<Test> sortedTests = tests.OrderByDescending(x => x.StringField).ToList();
-
-            Assert.True(tests.SequenceEqual(sortedTests));
+            Assert.True(sortedTests != null && sortedTests.Count == 2);
         }
 
         [Fact]
-        public async Task StringAscSortAndPaginationTest()
+        public void StringAscSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -191,20 +190,23 @@ namespace MongodbAccess.Tests
                                         x => x.StringField,
                                         SortType.Asc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> sortedTests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
-            Assert.True(tests != null && tests.Count == 2);
+            Assert.True(sortedTests != null && sortedTests.Count == 2);
 
-            IList<Test> sortedTests = tests.OrderBy(x => x.StringField).ToList();
+            IList<Test> memoryTests = getRepository.GetAll().ToList().OrderBy(x => x.StringField).Take(2).ToList();
 
-            Assert.True(tests.SequenceEqual(sortedTests));
+            Assert.True(sortedTests != null && sortedTests.Count == 2);
+            Assert.True(memoryTests != null && memoryTests.Count == 2);
+
+            Assert.True(sortedTests.SequenceEqual(memoryTests, _equalityComparer));
         }
 
         [Fact]
-        public async Task BoolDescSortAndPaginationTest()
+        public void BoolDescSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -214,10 +216,10 @@ namespace MongodbAccess.Tests
                                         x => x.BoolField,
                                         SortType.Desc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -227,7 +229,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task BoolAscSortAndPaginationTest()
+        public void BoolAscSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -237,10 +239,10 @@ namespace MongodbAccess.Tests
                                         x => x.BoolField,
                                         SortType.Asc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -250,7 +252,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task DatetimeDescSortAndPaginationTest()
+        public void DatetimeDescSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -260,10 +262,10 @@ namespace MongodbAccess.Tests
                                         x => x.TimestampField,
                                         SortType.Desc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -273,7 +275,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task DatetimeAscSortAndPaginationTest()
+        public void DatetimeAscSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -283,10 +285,10 @@ namespace MongodbAccess.Tests
                                         x => x.TimestampField,
                                         SortType.Asc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -296,7 +298,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NumberDescSortAndPaginationTest()
+        public void NumberDescSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -306,10 +308,10 @@ namespace MongodbAccess.Tests
                                         x => x.NumberField,
                                         SortType.Desc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -319,7 +321,7 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NumberAscSortAndPaginationTest()
+        public void NumberAscSortAndPaginationTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
@@ -329,10 +331,10 @@ namespace MongodbAccess.Tests
                                         x => x.NumberField,
                                         SortType.Asc);
 
-            IList<Test> tests = await getRepository.GetAllByConditionsAsync(
+            IList<Test> tests = getRepository.GetAllByConditions(
                                                         x => true,
                                                         sort,
-                                                        new Pagination(0, 2));
+                                                        new Pagination(0, 2)).ToList();
 
             Assert.True(tests != null && tests.Count == 2);
 
@@ -410,13 +412,13 @@ namespace MongodbAccess.Tests
         }
 
         [Fact]
-        public async Task NothingToDeleteTest()
+        public void NothingToDeleteTest()
         {
             MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
             IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
             IDeleteRepository<Test> deleteRepository = new MongodbDeleteRepository<Test>(database);
 
-            await deleteRepository.DeleteAllByConditionsAsync(x => x.ObjectId == "non-existent-object");
+            deleteRepository.DeleteAllByConditionsAsync(x => x.ObjectId == "non-existent-object");
         }
 
         #endregion
@@ -436,19 +438,19 @@ namespace MongodbAccess.Tests
             {
                 BoolField = true,
                 NumberField = 1,
-                ObjectId = "single-test-1",
+                ObjectId = Guid.NewGuid().ToString(),
                 StringField = "new-single-object",
                 TimestampField = DateTime.UtcNow
             };
 
             await saveRepository.InsertAsync(newTest);
 
-            Test savedTest = (await getRepository.GetAllByConditionsAsync(x =>
+            Test savedTest = await getRepository.GetFirstByConditionsAsync(x =>
                                 x.ObjectId == newTest.ObjectId &&
                                 x.BoolField == newTest.BoolField &&
                                 x.NumberField == newTest.NumberField &&
                                 x.StringField == newTest.StringField &&
-                                x.TimestampField == newTest.TimestampField)).Single();
+                                x.TimestampField == newTest.TimestampField);
 
             savedTest.BoolField = false;
             savedTest.NumberField = 2;
@@ -461,10 +463,10 @@ namespace MongodbAccess.Tests
                                     x.BoolField == newTest.BoolField &&
                                     x.NumberField == newTest.NumberField &&
                                     x.StringField == newTest.StringField &&
-                                    x.TimestampField == newTest.TimestampField, 
+                                    x.TimestampField == newTest.TimestampField,
                                 savedTest);
 
-            Test modifiedTest = (await getRepository.GetAllByConditionsAsync(x =>
+            Test modifiedTest = (getRepository.GetAllByConditions(x =>
                                     x.ObjectId == savedTest.ObjectId &&
                                     x.BoolField == savedTest.BoolField &&
                                     x.NumberField == savedTest.NumberField &&
@@ -478,12 +480,12 @@ namespace MongodbAccess.Tests
                                 x.StringField == savedTest.StringField &&
                                 x.TimestampField == savedTest.TimestampField);
 
-            Test deletedTest = (await getRepository.GetAllByConditionsAsync(x =>
+            Test deletedTest = await getRepository.GetFirstByConditionsAsync(x =>
                                    x.ObjectId == savedTest.ObjectId &&
                                    x.BoolField == savedTest.BoolField &&
                                    x.NumberField == savedTest.NumberField &&
                                    x.StringField == savedTest.StringField &&
-                                   x.TimestampField == savedTest.TimestampField)).FirstOrDefault();
+                                   x.TimestampField == savedTest.TimestampField);
 
             Assert.Null(deletedTest);
         }
@@ -501,7 +503,7 @@ namespace MongodbAccess.Tests
             {
                 BoolField = true,
                 NumberField = 1,
-                ObjectId = "multiple-test-1",
+                ObjectId = Guid.NewGuid().ToString(),
                 StringField = "multiple-object-1",
                 TimestampField = DateTime.UtcNow
             };
@@ -510,7 +512,7 @@ namespace MongodbAccess.Tests
             {
                 BoolField = true,
                 NumberField = 2,
-                ObjectId = "multiple-test-2",
+                ObjectId = Guid.NewGuid().ToString(),
                 StringField = "multiple-object-2",
                 TimestampField = DateTime.UtcNow.AddMinutes(1)
             };
@@ -522,9 +524,9 @@ namespace MongodbAccess.Tests
 
             await saveRepository.InsertManyAsync(newTests);
 
-            IList<Test> savedTests = await getRepository.GetAllByConditionsAsync(x =>
-                                x.ObjectId == newTest1.ObjectId || 
-                                x.ObjectId == newTest2.ObjectId);
+            IList<Test> savedTests = getRepository.GetAllByConditions(x =>
+                                x.ObjectId == newTest1.ObjectId ||
+                                x.ObjectId == newTest2.ObjectId).ToList();
 
             Assert.True(savedTests.Count == 2);
 
@@ -551,7 +553,9 @@ namespace MongodbAccess.Tests
                                     x.ObjectId == newTest2.ObjectId,
                                 updateDefinition);
 
-            IList<Test> modifiedTests = await getRepository.GetAllByConditionsAsync(x => x.StringField == modifiedStringField);
+            IList<Test> modifiedTests = getRepository.GetAllByConditions(x => 
+                                            x.StringField == modifiedStringField && 
+                                            (x.ObjectId == savedTest1.ObjectId || x.ObjectId == savedTest2.ObjectId)).ToList();
 
             Assert.True(modifiedTests.Count == 2);
 
@@ -559,7 +563,7 @@ namespace MongodbAccess.Tests
                 x.ObjectId == newTest1.ObjectId &&
                 x.NumberField == newTest1.NumberField &&
                 x.StringField == modifiedStringField &&
-                 DateTimeHelper.AreEquals(x.TimestampField,newTest1.TimestampField) &&
+                 DateTimeHelper.AreEquals(x.TimestampField, newTest1.TimestampField) &&
                 x.BoolField == newTest1.BoolField);
 
             Test modifiedTest2 = modifiedTests.Single(x =>
@@ -572,7 +576,7 @@ namespace MongodbAccess.Tests
             await deleteRepository.DeleteAllByConditionsAsync(x =>
                                 x.StringField == modifiedStringField);
 
-            IList<Test> deletedTests = await getRepository.GetAllByConditionsAsync(x => x.StringField == modifiedStringField);
+            IList<Test> deletedTests = getRepository.GetAllByConditions(x => x.StringField == modifiedStringField).ToList();
 
             Assert.True(deletedTests == null || deletedTests.Count == 0);
         }

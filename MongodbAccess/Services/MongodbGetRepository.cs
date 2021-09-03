@@ -3,7 +3,6 @@ using MongoDB.Driver.Linq;
 using MongodbAccess.Services;
 using RepositoryAccess;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -14,28 +13,22 @@ namespace MongodbAccess.Implementations
     {
         public MongodbGetRepository(IMongoDatabase mongoDatabase) : base(mongoDatabase) { }
 
-        public async Task<IList<T>> GetAllAsync()
+        public IQueryable<T> GetAll()
         {
-            IList<T> entities = await this._mongoCollection.AsQueryable().ToListAsync();
-
-            return entities;
+            return this._mongoCollection.AsQueryable();
         }
 
-        public async Task<IList<T>> GetAllByConditionsAsync(Expression<Func<T, bool>> expression)
+        public IQueryable<T> GetAllByConditions(Expression<Func<T, bool>> expression)
         {
-            IList<T> entities = await this.GetQueryableByConditions(expression).ToListAsync();
-
-            return entities;
+            return this.GetQueryableByConditions(expression);
         }
 
-        public async Task<IList<T>> GetAllByConditionsAsync<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
+        public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
         {
-            IList<T> entities = await this.GetQueryableByConditionsAndSort(expression, sort).ToListAsync();
-
-            return entities;
+            return this.GetQueryableByConditionsAndSort(expression, sort);
         }
 
-        public async Task<IList<T>> GetAllByConditionsAsync<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort, Pagination pagination)
+        public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort, Pagination pagination)
         {
             if (pagination == null)
             {
@@ -52,9 +45,24 @@ namespace MongodbAccess.Implementations
                 throw new ArgumentException(nameof(pagination.SkipNumber));
             }
 
-            IList<T> entities = await this.GetQueryableByConditionsAndSort(expression, sort).Skip(pagination.SkipNumber).Take(pagination.TakeNumber).ToListAsync();
+            IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort).Skip(pagination.SkipNumber).Take(pagination.TakeNumber);
 
             return entities;
+        }
+
+        public async Task<T> GetFirstByConditionsAsync(Expression<Func<T, bool>> expression)
+        {
+            T entity = await this._mongoCollection.AsQueryable().FirstOrDefaultAsync(expression);
+
+            return entity;
+        }
+
+        public async Task<T> GetFirstByConditionsAsync<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
+        {
+            IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort);
+            T entity = await entities.FirstOrDefaultAsync();
+
+            return entity;
         }
 
         private IMongoQueryable<T> GetQueryableByConditions(Expression<Func<T, bool>> expression)
@@ -81,11 +89,11 @@ namespace MongodbAccess.Implementations
             switch (sort.SortType)
             {
                 case SortType.Asc:
-                    entities = this._mongoCollection.AsQueryable().Where(expression).OrderBy(sort.SortExpression);
+                    entities = entities.OrderBy(sort.SortExpression);
                     break;
 
                 case SortType.Desc:
-                    entities = this._mongoCollection.AsQueryable().Where(expression).OrderByDescending(sort.SortExpression);
+                    entities = entities.OrderByDescending(sort.SortExpression);
                     break;
                 default:
                     throw new ArgumentException();

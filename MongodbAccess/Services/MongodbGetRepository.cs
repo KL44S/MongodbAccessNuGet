@@ -15,17 +15,23 @@ namespace MongodbAccess.Implementations
 
         public IQueryable<T> GetAll()
         {
-            return this._mongoCollection.AsQueryable();
+            IMongoQueryable<T> entities = this._mongoCollection.AsQueryable();
+
+            return ReturnMongoQueryable(entities);
         }
 
         public IQueryable<T> GetAllByConditions(Expression<Func<T, bool>> expression)
         {
-            return this.GetQueryableByConditions(expression);
+            IMongoQueryable<T> entities = this.GetQueryableByConditions(expression);
+
+            return ReturnMongoQueryable(entities);
         }
 
         public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
         {
-            return this.GetQueryableByConditionsAndSort(expression, sort);
+            IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort);
+
+            return ReturnMongoQueryable(entities);
         }
 
         public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort, Pagination pagination)
@@ -47,7 +53,7 @@ namespace MongodbAccess.Implementations
 
             IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort).Skip(pagination.SkipNumber).Take(pagination.TakeNumber);
 
-            return entities;
+            return ReturnMongoQueryable(entities);
         }
 
         public async Task<T> GetFirstByConditionsAsync(Expression<Func<T, bool>> expression)
@@ -100,6 +106,11 @@ namespace MongodbAccess.Implementations
             }
 
             return entities;
+        }
+
+        private IQueryable<T> ReturnMongoQueryable(IMongoQueryable<T> mongoQueryable)
+        {
+            return new MongodbQueryable<T>(mongoQueryable);
         }
     }
 }

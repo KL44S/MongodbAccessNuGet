@@ -6,10 +6,12 @@ using MongodbAccess.Tests.Helpers;
 using MongodbAccess.Tests.Models;
 using MongodbAccess.Tests.Services;
 using RepositoryAbstractions.Exceptions;
+using RepositoryAbstractions.Extensions;
 using RepositoryAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -177,6 +179,44 @@ namespace MongodbAccess.Tests
                                                         new Pagination(0, 2)).ToList();
 
             Assert.True(sortedTests != null && sortedTests.Count == 2);
+        }
+
+        [Fact]
+        public async Task AsyncStringDescSortAndPaginationTest()
+        {
+            MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
+            IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
+            IGetRepository<Test> getRepository = new MongodbGetRepository<Test>(database);
+
+            Sort<Test, string> sort = new Sort<Test, string>(
+                                        x => x.StringField,
+                                        SortType.Desc);
+
+            IList<Test> sortedTests = await getRepository.GetAllByConditions(
+                                                        x => true,
+                                                        sort,
+                                                        new Pagination(0, 2)).ToListAsync();
+
+            Assert.True(sortedTests != null && sortedTests.Count == 2);
+        }
+
+        [Fact]
+        public async Task AsyncStringDescSortAndPaginationCancelledTest()
+        {
+            MongodbConfig mongodbConfig = MongoDbHelper.GetMongodbConfig();
+            IMongoDatabase database = MongodbProvider.GetDatabase(mongodbConfig);
+            IGetRepository<Test> getRepository = new MongodbGetRepository<Test>(database);
+
+            Sort<Test, string> sort = new Sort<Test, string>(
+                                        x => x.StringField,
+                                        SortType.Desc);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(0.5));
+
+            await Assert.ThrowsAsync<OperationCanceledException>(async () => await getRepository.GetAllByConditions(
+                                                        x => true,
+                                                        sort,
+                                                        new Pagination(0, 2)).ToListAsync(cancellationTokenSource.Token));
         }
 
         [Fact]

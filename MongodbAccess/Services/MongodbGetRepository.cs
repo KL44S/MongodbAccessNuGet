@@ -3,8 +3,10 @@ using MongoDB.Driver.Linq;
 using MongodbAccess.Services;
 using RepositoryAccess;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongodbAccess.Implementations
@@ -13,28 +15,35 @@ namespace MongodbAccess.Implementations
     {
         public MongodbGetRepository(IMongoDatabase mongoDatabase) : base(mongoDatabase) { }
 
-        public IQueryable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            IMongoQueryable<T> entities = this._mongoCollection.AsQueryable();
+            List<T> entities = await this._mongoCollection.AsQueryable().ToListAsync(cancellationToken);
 
-            return ReturnMongoQueryable(entities);
+            return entities;
         }
 
-        public IQueryable<T> GetAllByConditions(Expression<Func<T, bool>> expression)
+        public async Task<IEnumerable<T>> GetAllByConditionsAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            IMongoQueryable<T> entities = this.GetQueryableByConditions(expression);
+            List<T> entities = await this.GetQueryableByConditions(expression).ToListAsync(cancellationToken);
 
-            return ReturnMongoQueryable(entities);
+            return entities;
         }
 
-        public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
+        public async Task<IEnumerable<T>> GetAllByConditionsAsync<TKey>(
+            Expression<Func<T, bool>> expression, 
+            Sort<T, TKey> sort,
+            CancellationToken cancellationToken = default)
         {
-            IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort);
+            List<T> entities = await this.GetQueryableByConditionsAndSort(expression, sort).ToListAsync(cancellationToken);
 
-            return ReturnMongoQueryable(entities);
+            return entities;
         }
 
-        public IQueryable<T> GetAllByConditions<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort, Pagination pagination)
+        public async Task<IEnumerable<T>> GetAllByConditionsAsync<TKey>(
+            Expression<Func<T, bool>> expression, 
+            Sort<T, TKey> sort, 
+            Pagination pagination,
+            CancellationToken cancellationToken = default)
         {
             if (pagination == null)
             {
@@ -51,22 +60,28 @@ namespace MongodbAccess.Implementations
                 throw new ArgumentException(nameof(pagination.SkipNumber));
             }
 
-            IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort).Skip(pagination.SkipNumber).Take(pagination.TakeNumber);
+            List<T> entities = await this.GetQueryableByConditionsAndSort(expression, sort)
+                                            .Skip(pagination.SkipNumber)
+                                            .Take(pagination.TakeNumber)
+                                            .ToListAsync(cancellationToken);
 
-            return ReturnMongoQueryable(entities);
+            return entities;
         }
 
-        public async Task<T> GetFirstByConditionsAsync(Expression<Func<T, bool>> expression)
+        public async Task<T> GetFirstByConditionsAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
         {
-            T entity = await this._mongoCollection.AsQueryable().FirstOrDefaultAsync(expression);
+            T entity = await this._mongoCollection.AsQueryable().FirstOrDefaultAsync(expression, cancellationToken);
 
             return entity;
         }
 
-        public async Task<T> GetFirstByConditionsAsync<TKey>(Expression<Func<T, bool>> expression, Sort<T, TKey> sort)
+        public async Task<T> GetFirstByConditionsAsync<TKey>(
+            Expression<Func<T, bool>> expression, 
+            Sort<T, TKey> sort,
+            CancellationToken cancellationToken = default)
         {
             IMongoQueryable<T> entities = this.GetQueryableByConditionsAndSort(expression, sort);
-            T entity = await entities.FirstOrDefaultAsync();
+            T entity = await entities.FirstOrDefaultAsync(cancellationToken);
 
             return entity;
         }
@@ -106,11 +121,6 @@ namespace MongodbAccess.Implementations
             }
 
             return entities;
-        }
-
-        private IQueryable<T> ReturnMongoQueryable(IMongoQueryable<T> mongoQueryable)
-        {
-            return new MongodbQueryable<T>(mongoQueryable);
         }
     }
 }

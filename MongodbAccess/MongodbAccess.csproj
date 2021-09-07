@@ -6,15 +6,15 @@
     <Authors>KL44S</Authors>
     <Company>MT</Company>
     <Description>Provides concrete repositories to access to MongoDB.</Description>
-    <Version>4.1.0</Version>
-    <AssemblyVersion>4.1.0.0</AssemblyVersion>
-    <FileVersion>4.1.0.0</FileVersion>
+    <Version>5.0.0</Version>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RepositoryAbstractions" Version="7.3.0" />
+    <PackageReference Include="RepositoryAbstractions" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

@@ -3,12 +3,16 @@ using MongodbAccess.Model;
 using RepositoryAccess;
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongodbAccess
 {
     public interface IMongodbSaveRepository<T> : ISaveRepository<T>
     {
-        Task<SaveResult> UpdateManyAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> updateDefinition);
+        Task<SaveResult> UpdateManyAsync(
+            Expression<Func<T, bool>> expression, 
+            UpdateDefinition<T> updateDefinition,
+            CancellationToken cancellationToken = default);
     }
 }

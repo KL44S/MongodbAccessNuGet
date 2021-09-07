@@ -1,0 +1,51 @@
+resources:
+  pipelines:
+  - pipeline: mongodb-ci
+    source: MongoDBAccess-CI
+    trigger:
+      branches:
+        include:
+        - master
+
+trigger: none
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: secrets
+- name: artifactPath
+  value: '$(Pipeline.Workspace)/mongodb-ci/drop'
+- name: pkgName
+  value: ''
+
+steps:
+- task: DownloadPipelineArtifact@2
+  displayName: Download Artifact
+  inputs:
+    buildType: 'specific'
+    project: '50289722-edfb-4117-aa0a-52d588229c77'
+    definition: '9'
+    specificBuildWithTriggering: true
+    buildVersionToDownload: 'specific'
+    pipelineId: $(resources.pipeline.mongodb-ci.runID)
+    artifactName: 'drop'
+    targetPath: '$(Pipeline.Workspace)/mongodb-ci/drop'
+
+- task: UseDotNet@2
+  displayName: Use dotnet
+  inputs:
+    packageType: 'runtime'
+    version: '5.x'
+
+- bash: |
+        pkgName=`ls '$(Pipeline.Workspace)/mongodb-ci/drop'`
+        echo "##vso[task.setvariable variable=pkgName]$pkgName"
+  displayName: Get Package Name
+
+- script: dotnet nuget push $(artifactPath)/$(pkgName) -k $NUGETKEY -s https://api.nuget.org/v3/index.json
+  env:
+    NUGETKEY: $(nuget-key-vg)
+  displayName: Push NuGet to feed

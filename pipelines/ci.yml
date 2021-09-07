@@ -1,0 +1,40 @@
+trigger:
+- master
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  csprojFile: MongodbAccess.csproj
+
+steps:
+- task: UseDotNet@2
+  displayName: Use dotnet
+  inputs:
+    packageType: 'runtime'
+    version: '5.x'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet build
+  inputs:
+    command: 'build'
+    projects: '**/$(csprojFile)'
+    arguments: '--configuration Release'
+    workingDirectory: '$(Pipeline.Workspace)'
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet pack
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/$(csprojFile)'
+    packDirectory: '$(Build.ArtifactStagingDirectory)'
+    versioningScheme: 'off'
+
+- task: PublishPipelineArtifact@1
+  displayName: Publish artifact
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'drop'
+    publishLocation: 'pipeline'

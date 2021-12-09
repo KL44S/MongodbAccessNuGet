@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>MongodbAccess</RootNamespace>
     <Authors>KL44S</Authors>
     <Company>MT</Company>
@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.13.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.14.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RepositoryAbstractions" Version="10.0.0" />
+    <PackageReference Include="RepositoryAbstractions" Version="11.0.0" />
   </ItemGroup>
 
 </Project>

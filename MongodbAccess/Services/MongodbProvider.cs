@@ -45,6 +45,20 @@ namespace MongodbAccess.Services
             return database;
         }
 
+        public static MongoClient? GetMongoClient(MongodbConfig mongodbConfig)
+        {
+            ArgumentNullException.ThrowIfNull(mongodbConfig, nameof(mongodbConfig));
+
+            MongoClient? mongoClient = null;
+
+            if (MongoClients.ContainsKey(mongodbConfig.ConnectionString))
+            {
+                mongoClient = MongoClients[mongodbConfig.ConnectionString];
+            }
+
+            return mongoClient;
+        }
+
         private static void ValidateParams(MongodbConfig mongodbConfig)
         {
             if (mongodbConfig == null)

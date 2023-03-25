@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using RepositoryAbstractions;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MongodbAccess.Services
@@ -14,17 +15,17 @@ namespace MongodbAccess.Services
             this._clientSessionHandle = clientSessionHandle ?? throw new ArgumentNullException(nameof(clientSessionHandle));
         }
 
-        public Task AbortTransactionAsync()
+        public Task AbortTransactionAsync(CancellationToken cancellationToken)
         {
-            return this._clientSessionHandle.AbortTransactionAsync();
+            return this._clientSessionHandle.AbortTransactionAsync(cancellationToken);
         }
 
-        public Task CommitTransactionAsync()
+        public Task CommitTransactionAsync(CancellationToken cancellationToken)
         {
-            return this._clientSessionHandle.CommitTransactionAsync();
+            return this._clientSessionHandle.CommitTransactionAsync(cancellationToken);
         }
 
-        public Task StartTransactionAsync()
+        public Task StartTransactionAsync(CancellationToken cancellationToken)
         {
             this._clientSessionHandle.StartTransaction();
 
